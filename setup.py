@@ -12,7 +12,7 @@ DESCRIPTION = '\n\n'.join(LOAD_TEXT(_) for _ in [
 setup(
   name = 'cgnlib',      
   packages = ['cgnlib'], 
-  version = '0.0.1', 
+  version = '0.0.2', 
   license='MIT', 
   description = 'CGNLib, a Python library, enhances GN by allowing experimentation with different centrality metrics—Edge Betweenness, Edge Closeness, PageRank, and Degree Centrality. This flexibility can improve community detection results. The library is easy to integrate via Pip and includes a benchmarking method for experiments.',
   long_description=DESCRIPTION,
