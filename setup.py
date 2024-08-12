@@ -14,13 +14,24 @@ setup(
   packages = ['cgnlib'], 
   version = '0.0.1', 
   license='MIT', 
-  description = '',
+  description = 'CGNLib, a Python library, enhances GN by allowing experimentation with different centrality metrics—Edge Betweenness, Edge Closeness, PageRank, and Degree Centrality. This flexibility can improve community detection results. The library is easy to integrate via Pip and includes a benchmarking method for experiments. CGNLib also features the "Hat Yai Tourism" dataset, inspired by the need to optimize community detection in Hat Yai, Songkhla’s tourism routes, making it valuable for research and practical applications.',
   long_description=DESCRIPTION,
   author = 'chinnapongpsu',                 
   author_email = 'chinnapong.a@psu.ac.th',     
   url = 'https://github.com/chinnapongpsu/cgnlib',  
   download_url = '',  
-  keywords = ['cgn',],
+  keywords = [
+    'cgn',
+    "Community Detection"
+    "Community",
+    "Detection"
+    "Girvan-Newman" 
+    "Centrality Metrics"
+              ],
+  install_requires=[            # I get to this in a second
+          'networkx',
+          'cdlib',
+      ],
   classifiers=[
     'Development Status :: 3 - Alpha',     
     'Intended Audience :: Education',     
