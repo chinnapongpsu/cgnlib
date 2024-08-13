@@ -76,24 +76,6 @@ class cgnlib:
         edge_to_node = {edge: i for i, edge in enumerate(G.edges(), 1)}
         H = nx.Graph()
 
-<<<<<<< HEAD
-		metrics = {
-			"Modularity": modularity,
-			"Average Conductance": average_conductance,
-			"Conductance": conductances,
-		}
-		
-		return metrics
-	
-
-if __name__ == '__main__':
-	cgn = cgnlib('soc.graph')
-	best_communities = cgn.detect_gn(method='closeness')
-	print( cgn.evaluate_community_quality() )
-	# help(my)
-
-
-=======
         for edge1 in G.edges():
             H.add_node(edge_to_node[edge1])
             for edge2 in G.edges():
@@ -293,4 +275,3 @@ if __name__ == '__main__':
     cgn.save_communities_to_csv('community_results.csv')
     print(cgn.evaluate_community_quality())
     cgn.visualize_with_node_attributes(attribute="degree")
->>>>>>> 6d72c6f (Adding cgnexp class, a wrapper for conducting experiments)
