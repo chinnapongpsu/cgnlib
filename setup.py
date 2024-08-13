@@ -12,14 +12,14 @@ DESCRIPTION = '\n\n'.join(LOAD_TEXT(_) for _ in [
 setup(
   name = 'cgnlib',      
   packages = ['cgnlib'], 
-  version = '0.0.2', 
+  version = '0.0.4', 
   license='MIT', 
   description = 'CGNLib, a Python library, enhances GN by allowing experimentation with different centrality metrics—Edge Betweenness, Edge Closeness, PageRank, and Degree Centrality. This flexibility can improve community detection results. The library is easy to integrate via Pip and includes a benchmarking method for experiments.',
   long_description=DESCRIPTION,
   author = 'chinnapongpsu',                 
   author_email = 'chinnapong.a@psu.ac.th',     
   url = 'https://github.com/chinnapongpsu/cgnlib',  
-  download_url = 'https://github.com/chinnapongpsu/cgnlib/archive/refs/tags/0.0.1.zip',  
+  download_url = 'https://github.com/chinnapongpsu/cgnlib/archive/refs/tags/0.0.4.zip',  
   keywords = [
     'cgn',
     "Community Detection"
@@ -30,7 +30,9 @@ setup(
               ],
   install_requires=[            # I get to this in a second
           'networkx',
-          'cdlib',
+          'igraph',
+          'netcenlib',
+          'matplotlib'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',     
