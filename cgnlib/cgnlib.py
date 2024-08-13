@@ -1,26 +1,12 @@
 # myprofile.py
 import networkx as nx
 import netcenlib as ncl
-<<<<<<< HEAD
-import time
-
-class cgnlib:
-	
-	def __init__(self,file,method="closeness"):
-		#self.GraphSet =nx.Graph()
-		self.file=file
-		self.method=method
-		self.best_communities=None
-
-		self.GraphSet = self._create_graph_from(file)
-=======
 import matplotlib.pyplot as plt
 import csv
 
 class cgnlib:
     """
     A class for community detection in graphs using various centrality measures.
->>>>>>> 6d72c6f (Adding cgnexp class, a wrapper for conducting experiments)
 
     This class provides methods for loading a graph, performing community detection using
     the Girvan-Newman algorithm, evaluating community quality, and visualizing results. 
