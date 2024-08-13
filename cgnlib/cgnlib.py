@@ -1,12 +1,9 @@
 # myprofile.py
 import networkx as nx
 import netcenlib as ncl
-
-
-
 import time
 
-class Cgnlib:
+class cgnlib:
 	
 	def __init__(self,file,method="closeness"):
 		#self.GraphSet =nx.Graph()
@@ -120,7 +117,7 @@ class Cgnlib:
 	
 
 if __name__ == '__main__':
-	cgn = Cgnlib('soc.graph')
+	cgn = cgnlib('soc.graph')
 	best_communities = cgn.detect_gn(method='closeness')
 	print( cgn.evaluate_community_quality() )
 	# help(my)
