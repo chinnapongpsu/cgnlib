@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGNLib and CGNExp Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .param, .returns {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Documentation for CGNLib and CGNExp</h1>
+
+    <div class="section">
+        <h2>Class: <code>cgnlib</code></h2>
+        <p><strong>Purpose:</strong> Provides functionalities for community detection using various centrality metrics.</p>
+        
+        <h3>Methods:</h3>
+        
+        <h4><code>__init__(self, file, method="closeness")</code></h4>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">file</span> (str): Path to the graph file.</li>
+            <li><span class="param">method</span> (str): The centrality metric to use. Default is "closeness".</li>
+        </ul>
+        
+        <h4><code>_create_graph_from(self, file)</code></h4>
+        <p><strong>Purpose:</strong> Creates a graph from the specified file.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">file</span> (str): Path to the graph file.</li>
+        </ul>
+        <p><strong>Returns:</strong> NetworkX graph object.</p>
+        
+        <h4><code>_calculate_centrality_for_edges(self, G, metric='closeness')</code></h4>
+        <p><strong>Purpose:</strong> Calculates centrality metrics for edges.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">G</span> (networkx.Graph): The graph object.</li>
+            <li><span class="param">metric</span> (str): Centrality metric to use.</li>
+        </ul>
+        <p><strong>Returns:</strong> Dictionary with edges as keys and centrality values as values.</p>
+        
+        <h4><code>detect_gn(self, method='closeness')</code></h4>
+        <p><strong>Purpose:</strong> Detects communities using the Girvan-Newman algorithm.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">method</span> (str): The centrality metric to use.</li>
+        </ul>
+        <p><strong>Returns:</strong> List of communities.</p>
+        
+        <h4><code>evaluate_community_quality(self)</code></h4>
+        <p><strong>Purpose:</strong> Evaluates the quality of detected communities.</p>
+        <p><strong>Returns:</strong> Dictionary with modularity, average conductance, and number of communities.</p>
+        
+        <h4><code>visualize_best_communities(self, save_path=None)</code></h4>
+        <p><strong>Purpose:</strong> Visualizes the best detected communities.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">save_path</span> (str): Path to save the visualization image.</li>
+        </ul>
+        <p><strong>Returns:</strong> None.</p>
+        
+        <h4><code>visualize_with_node_attributes(self, attribute='degree', save_path=None)</code></h4>
+        <p><strong>Purpose:</strong> Visualizes communities with node attributes.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">attribute</span> (str): Node attribute to use.</li>
+            <li><span class="param">save_path</span> (str): Path to save the visualization image.</li>
+        </ul>
+        <p><strong>Returns:</strong> None.</p>
+        
+        <h4><code>save_communities_to_csv(self, filename='community_results.csv')</code></h4>
+        <p><strong>Purpose:</strong> Saves the detected communities to a CSV file.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">filename</span> (str): Name of the CSV file.</li>
+        </ul>
+        <p><strong>Returns:</strong> None.</p>
+    </div>
+
+    <div class="section">
+        <h2>Class: <code>cgnexp</code></h2>
+        <p><strong>Purpose:</strong> Conducts experiments on community detection using various centrality metrics.</p>
+        
+        <h3>Methods:</h3>
+        
+        <h4><code>__init__(self, file)</code></h4>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">file</span> (str): Path to the graph file.</li>
+        </ul>
+        
+        <h4><code>run_experiments(self, metrics=None, save_images=False)</code></h4>
+        <p><strong>Purpose:</strong> Runs experiments with specified centrality metrics.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">metrics</span> (list of str): List of centrality metrics.</li>
+            <li><span class="param">save_images</span> (bool): If True, saves visualizations.</li>
+        </ul>
+        <p><strong>Returns:</strong> None.</p>
+        
+        <h4><code>print_results(self)</code></h4>
+        <p><strong>Purpose:</strong> Prints the results of the experiments.</p>
+        <p><strong>Returns:</strong> None.</p>
+        
+        <h4><code>export_results_to_csv(self, filename='experiment_results.csv')</code></h4>
+        <p><strong>Purpose:</strong> Exports the results to a CSV file.</p>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><span class="param">filename</span> (str): Name of the CSV file.</li>
+        </ul>
+        <p><strong>Returns:</strong> None.</p>
+        
+        <h3>Example Usage:</h3>
+        <pre><code>
+if __name__ == '__main__':
+    exp = cgnexp('hdy.graph')
+    exp.run_experiments(metrics=['closeness', 'betweenness', 'pagerank', 'degree', 'heatmap', 'harmonic', 'subgraph', 'laplacian','rumor'], save_images=True)
+    exp.print_results()
+    exp.export_results_to_csv('experiment_results.csv')
+        </code></pre>
+    </div>
+</body>
+</html>
