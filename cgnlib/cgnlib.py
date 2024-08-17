@@ -271,7 +271,7 @@ class cgnlib:
 if __name__ == '__main__':
     cgn = cgnlib('soc.graph')
     best_communities = cgn.detect_gn(method='closeness')
-    cgn.visualize_best_communities()
+    cgn.visualize_best_communities("best_communities.png")
     cgn.save_communities_to_csv('community_results.csv')
     print(cgn.evaluate_community_quality())
-    cgn.visualize_with_node_attributes(attribute="degree")
+    cgn.visualize_with_node_attributes(attribute="closeness")

@@ -26,13 +26,18 @@ class cgnexp:
         self.graph_data = cgnlib(file)
         self.results = []
     
-    def run_experiments(self):
+    def run_experiments(self, save_images=False):
         """
         Runs community detection experiments for all defined centrality metrics.
 
         This method executes the `detect_gn` method from the `cgnlib` class for each centrality 
-        measure and collects modularity and average conductance metrics.
+        measure and collects modularity and average conductance metrics. Optionally saves 
+        visualizations of the best communities.
 
+        Args:
+            save_images (bool): If True, saves visualizations of the best communities 
+                                for each centrality metric. Default is False.
+        
         Metrics tested:
             - 'closeness'
             - 'betweenness'
@@ -48,11 +53,17 @@ class cgnexp:
             quality_metrics = self.graph_data.evaluate_community_quality()
             modularity = quality_metrics.get("Modularity")
             average_conductance = quality_metrics.get("Average Conductance")
+            
             self.results.append({
                 'Centrality Metric': metric,
                 'Modularity': modularity,
                 'Average Conductance': average_conductance
             })
+            
+            if save_images:
+                image_filename = f"{self.file.split('.')[0]}_{metric}.png"
+                self.graph_data.visualize_best_communities(image_filename)
+                print(f"Image saved as {image_filename}")
     
     def print_results(self):
         """
@@ -84,7 +95,7 @@ class cgnexp:
         print(f"Results exported to {filename}")
 
 if __name__ == '__main__':
-    exp = cgnexp('soc.graph')
-    exp.run_experiments()
+    exp = cgnexp('hdy.graph')
+    exp.run_experiments(save_images=True)
     exp.print_results()
     exp.export_results_to_csv('experiment_results.csv')
