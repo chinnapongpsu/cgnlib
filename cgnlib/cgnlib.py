@@ -2,6 +2,7 @@ import networkx as nx
 import netcenlib as ncl
 import matplotlib.pyplot as plt
 import csv
+from networkx.algorithms.community import girvan_newman
 
 class cgnlib:
     def __init__(self, file, method="closeness"):
@@ -25,6 +26,13 @@ class cgnlib:
             print("Please ensure the input file is in the correct format with each line containing exactly two nodes separated by a space.")
             return None
         return G
+    
+    
+    def coverage(self, graph, clusters):
+        total_edges = graph.number_of_edges()
+        intra_cluster_edges = sum(graph.subgraph(cluster).number_of_edges() for cluster in clusters)
+        coverage = intra_cluster_edges / total_edges if total_edges > 0 else 0
+        return coverage
 
     def _calculate_centrality_for_edges(self, G, metric='closeness'):
         edge_to_node = {edge: i for i, edge in enumerate(G.edges(), 1)}
@@ -54,7 +62,19 @@ class cgnlib:
         centrality_edge_mapping = {edge: centrality[edge_to_node[edge]] for edge in G.edges()}
         return centrality_edge_mapping
 
+    def detect_classic_gn(self):
+        graph = self.GraphSet.copy()  # Copy of the original graph to work with
+        comp = girvan_newman(graph)   # Run NetworkX's Girvan-Newman algorithm
+        classic_communities = tuple(sorted(c) for c in next(comp))  # Get first partition of communities
+        # Store or return results as needed
+        self.best_communities = classic_communities 
+        return classic_communities
+
     def detect_gn(self, method='closeness'):
+
+        if method=='Girvan-Newman':
+            return self.detect_classic_gn()
+
         graph = self.GraphSet.copy()
         best_modularity = -1
         best_communities = []
@@ -95,22 +115,28 @@ class cgnlib:
                 conductance = nx.algorithms.cuts.conductance(G, community)
             conductances.append(conductance)
 
+        # Filter out None values to calculate metrics
         valid_conductances = [c for c in conductances if c is not None]
         if valid_conductances:
             average_conductance = sum(valid_conductances) / len(valid_conductances)
+            min_conductance = min(valid_conductances)
+            max_conductance = max(valid_conductances)
         else:
-            average_conductance = None
+            average_conductance = min_conductance = max_conductance = None
 
-        # Add the number of communities to the metrics
-        number_of_communities = len(communities)
+        # Calculate coverage
+        coverage_metric = self.coverage(G, communities)
 
+        # Add metrics to the dictionary
         metrics = {
             "Modularity": modularity,
             "Average Conductance": average_conductance,
+            "Min Conductance": min_conductance,
+            "Max Conductance": max_conductance,
+            "Coverage": coverage_metric,
             "Conductance": conductances,
-            "Number of Communities": number_of_communities  # New metric
+            "Number of Communities": len(communities)
         }
-
         return metrics
 
 
