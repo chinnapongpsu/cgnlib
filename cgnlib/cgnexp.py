@@ -1,6 +1,9 @@
 import csv
 import os
 from cgnlib import cgnlib
+import time
+import tracemalloc
+
 
 class cgnexp:
     """
@@ -39,8 +42,22 @@ class cgnexp:
             for metric in metrics:
                 try:
                     print(f"Running experiment on {dataset_name} with {metric} centrality...")
+
+                    start_time = time.perf_counter()
+                    tracemalloc.start()
+
                     communities = graph_data.detect_gn(method=metric)
                     quality_metrics = graph_data.evaluate_community_quality()
+
+                    current, peak = tracemalloc.get_traced_memory()
+                    end_time = time.perf_counter()
+                    tracemalloc.stop()
+
+                    exec_time = round(end_time - start_time, 3)
+                    peak_memory = round(peak / 1024 / 1024, 2)  # MB
+                    print(f"      ✅ Done in {exec_time} sec, peak memory = {peak_memory} MB")
+
+
                     modularity = quality_metrics.get("Modularity")
                     average_conductance = quality_metrics.get("Average Conductance")
                     min_conductance = quality_metrics.get("Min Conductance")
@@ -97,10 +114,11 @@ class cgnexp:
             for result in self.results:
                 writer.writerow(result)
         print(f"Results exported to {filename}")
+    
 
 if __name__ == '__main__':
     # Multiple datasets can be specified
-    exp = cgnexp(['Les.txt', 'Zachary.txt'])
-    exp.run_experiments(metrics=['Girvan-Newman', 'closeness', 'betweenness', 'load', 'subgraph', 'algebraic'], save_images=True, save_folder='result')
+    exp = cgnexp(['Zachary.txt', 'Contiguous_USA.txt', 'aves-weaver-social.txt'])
+    exp.run_experiments(metrics=['gec'], save_images=True, save_folder='result')
     exp.print_results()
     exp.export_results_to_csv('experiment_results_multiple.csv')

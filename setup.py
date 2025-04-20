@@ -12,14 +12,14 @@ DESCRIPTION = '\n\n'.join(LOAD_TEXT(_) for _ in [
 setup(
   name = 'cgnlib',      
   packages = ['cgnlib'], 
-  version = '0.1.6', 
+  version = '0.1.7', 
   license='MIT', 
   description = 'CGNLib, a Python library, enhances GN by allowing experimentation with different centrality metric. This flexibility can improve community detection results.',
   long_description=DESCRIPTION,
   author = 'chinnapongpsu',                 
   author_email = 'chinnapong.a@psu.ac.th',     
   url = 'https://github.com/chinnapongpsu/cgnlib',  
-  download_url = 'https://github.com/chinnapongpsu/cgnlib/archive/refs/tags/0.1.6.zip',  
+  download_url = 'https://github.com/chinnapongpsu/cgnlib/archive/refs/tags/0.1.7.zip',  
   keywords = [
     'cgn',
     "Community Detection"
