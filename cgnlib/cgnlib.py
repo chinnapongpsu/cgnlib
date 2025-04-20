@@ -3,6 +3,10 @@ import netcenlib as ncl
 import matplotlib.pyplot as plt
 import csv
 from networkx.algorithms.community import girvan_newman
+from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import eigsh
+
+
 
 class cgnlib:
     def __init__(self, file, method="closeness"):
@@ -34,6 +38,133 @@ class cgnlib:
         coverage = intra_cluster_edges / total_edges if total_edges > 0 else 0
         return coverage
 
+    
+    def _l1_centrality(self, graph):
+        """
+        Computes L1 centrality for all nodes in the given graph.
+
+        L1(v) = 1 - (D(v) - D_min) / (D_max - D_min),
+        where D(v) is the sum of shortest path lengths from node v.
+        """
+        all_distances = dict(nx.all_pairs_shortest_path_length(graph))
+        total_distance = {}
+
+        for node, distances in all_distances.items():
+            total_distance[node] = sum(distances.values())
+
+        D_values = list(total_distance.values())
+        D_min = min(D_values)
+        D_max = max(D_values)
+
+        l1_scores = {}
+        for node in graph.nodes():
+            if D_max == D_min:
+                l1_scores[node] = 1.0
+            else:
+                l1_scores[node] = 1 - ((total_distance[node] - D_min) / (D_max - D_min))
+        return l1_scores
+    
+    def _gec_centrality(self, graph):
+        """
+        Computes Graph Energy Centrality (GEC) for all nodes.
+        GEC(v) = E(G) - E(G - v), where E is the sum of absolute eigenvalues.
+        """
+        import numpy as np
+
+        def graph_energy(G):
+            #A = nx.to_numpy_array(G)
+            #eigenvalues = np.linalg.eigvals(A)
+            try:
+                A = nx.to_scipy_sparse_array(G, format='csr').astype(float)
+                k = min(10, A.shape[0] - 1)
+                if k < 1:
+                    return 0.0
+                eigenvalues = eigsh(A, k=k, return_eigenvectors=False)
+                return np.sum(np.abs(eigenvalues))
+            except Exception as e:
+                print("⚠️ Fallback to dense eigvals due to:", e)
+                A_dense = nx.to_numpy_array(G).astype(float)
+                eigenvalues = np.linalg.eigvals(A_dense)
+                return np.sum(np.abs(eigenvalues))
+        base_energy = graph_energy(graph)
+        gec_scores = {}
+
+        for node in graph.nodes():
+            G_minus_v = graph.copy()
+            G_minus_v.remove_node(node)
+            reduced_energy = graph_energy(G_minus_v)
+            gec_scores[node] = base_energy - reduced_energy
+
+        # Normalize to [0, 1]
+        max_score = max(gec_scores.values())
+        if max_score > 0:
+            for node in gec_scores:
+                gec_scores[node] /= max_score
+
+        return gec_scores
+
+
+    def _tworw_centrality(self, graph):
+        """
+        Approximate Two-Way Random Walk (2RW) Centrality.
+        Based on two-step transition probabilities.
+        """
+        import numpy as np
+
+        nodes = list(graph.nodes())
+        n = len(nodes)
+        node_index = {node: i for i, node in enumerate(nodes)}
+
+        A = nx.to_numpy_array(graph, nodelist=nodes)
+        degrees = A.sum(axis=1)
+
+        # Build transition matrix P: P[i][j] = 1/deg(i) if (i,j) is an edge
+        P = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                if A[i][j] == 1:
+                    P[i][j] = 1 / degrees[i] if degrees[i] > 0 else 0
+
+        # Compute two-step transition matrix
+        P2 = np.matmul(P, P)
+
+        # Sum over all (i, j) pairs: total probability of visiting k
+        scores = np.zeros(n)
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    for k in range(n):
+                        scores[k] += P[i][k] * P[k][j]  # probability of passing through k on i->j trip
+
+        # Normalize to [0, 1]
+        max_score = np.max(scores)
+        if max_score > 0:
+            scores = scores / max_score
+
+        return {node: float(scores[i]) for node, i in node_index.items()}
+
+
+    def _isolating_centrality(self, graph):
+        """
+        Computes Isolating Centrality:
+        Score = degree(v) * number of neighbors with degree 1
+        """
+        scores = {}
+        degrees = dict(graph.degree())
+
+        for node in graph.nodes():
+            neighbors = list(graph.neighbors(node))
+            num_weak_neighbors = sum(1 for n in neighbors if degrees[n] == 1)
+            scores[node] = degrees[node] * num_weak_neighbors
+
+        # Normalize to [0, 1]
+        max_score = max(scores.values()) if scores else 1
+        if max_score > 0:
+            for node in scores:
+                scores[node] /= max_score
+        return scores
+
+
     def _calculate_centrality_for_edges(self, G, metric='closeness'):
         edge_to_node = {edge: i for i, edge in enumerate(G.edges(), 1)}
         H = nx.Graph()
@@ -53,6 +184,15 @@ class cgnlib:
             centrality = nx.pagerank(H)
         elif metric == 'degree':
             centrality = dict(H.degree())
+        elif metric == 'l1':
+            centrality = self._l1_centrality(H)
+        elif metric == 'tworw':
+            centrality = self._tworw_centrality(H)
+        elif metric == 'gec':
+            centrality = self._gec_centrality(H)
+        elif metric == 'isolating':
+            centrality = self._isolating_centrality(H)
+
         elif hasattr(ncl.algorithms, f'{metric}_centrality'):
             centrality_func = getattr(ncl.algorithms, f'{metric}_centrality')
             centrality = centrality_func(H)
